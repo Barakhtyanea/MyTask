@@ -174,6 +174,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+let edk = 1;
+
 let swapiTable = ({
   data, handleClickDeleteSelected, handleClickAddNewElement, handleClickEditElement, labels, values,
 }) => {
@@ -309,14 +311,46 @@ let swapiTable = ({
   };
 
 
+  const [rowEditorVisible, setRowEditorVisible] = React.useState(false)
+  const [editorCurrentObject, setEditorCurrentObject] = React.useState({})
+  const [editorCompletionHandler, setEditorCompletionHandler] = React.useState({ fn: (r) => 1 } )
+
+  function handleClickAddIcon() {
+    setEditorCurrentObject({})
+    setEditorCompletionHandler( { fn: (r) => handleClickAddNewElement(r) } )
+    setRowEditorVisible(true)
+  }
+
+  function handleClickEditIcon(row) {
+    console.log("handleClickEditIcon", row)
+    setEditorCurrentObject(row)
+    setEditorCompletionHandler({ fn: (r)=> handleClickEditElement(r) } )
+    setRowEditorVisible(true)
+  }
+
+  function handleEditorApply(row) {
+    console.log("handleEditorApply", row)
+    editorCompletionHandler.fn(row)
+    setRowEditorVisible(false)
+  }
+
   return (
     <div>
       <Paper className={classes.paper}>
+        <EditForm
+            key={++edk}
+            changeElement={(row) => handleEditorApply(row)}
+            data={editorCurrentObject}
+            theadLabels={labels}
+            theadValues={values}
+            openEditor={rowEditorVisible}
+            cancelClose={()=> setRowEditorVisible(false)}
+        />
         <EnhancedTableToolbar
           theadLabels={labels}
           numSelected={selected.length}
           deleteSelected={() => { handleClickDeleteSelected(selected); setSelected([]); }}
-          newElement={() => { handleClickAddNewElement(newObject); handleClickEditElement(newObject); }}
+          newElement={() => handleClickAddIcon()}
           theadValues={values}
         />
         <TableContainer>
@@ -360,12 +394,9 @@ let swapiTable = ({
                       <TableCell align="right">{row[values.valueThree]}</TableCell>
                       <TableCell align="right">{row[values.valueFour]}</TableCell>
                       <TableCell align="right">
-                        <EditForm
-                          theadValues={values}
-                          data={row}
-                          theadLabels={labels}
-                          changeElement={(changedObject) => handleClickEditElement(changedObject)}
-                        />
+                          <IconButton aria-label="Edit" onClick={()=> handleClickEditIcon(row)}>
+                            <CreateIcon />
+                          </IconButton>
                       </TableCell>
                     </TableRow>
                   );

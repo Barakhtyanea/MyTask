@@ -26,15 +26,12 @@ const useButtonStyles = makeStyles((theme) => ({
 }));
 
 const EditForm = ({
-  changeElement, changedObject, data, theadLabels, theadValues,
+  changeElement, data, theadLabels, theadValues, openEditor, cancelClose
 }) => {
+
+  console.log("EditForm", data, theadLabels, theadValues)
+
   const classes = useButtonStyles();
-
-  const [open, setOpen] = React.useState(false);
-
-  const handleToggle = () => {
-    setOpen(!open);
-  };
 
   const [firstValue, setFirstValue] = useState(data[theadValues.valueOne]);
   const [secondValue, setSecondValue] = useState(data[theadValues.valueTwo]);
@@ -55,12 +52,10 @@ const EditForm = ({
   };
 
   const handleCancelClose = () => {
-    setOpen(false);
+    cancelClose()
   };
 
   const handleClose = () => {
-    ``;
-    setOpen(false);
     data[theadValues.valueOne] = firstValue;
     data[theadValues.valueTwo] = secondValue;
     data[theadValues.valueThree] = thirdValue;
@@ -70,12 +65,7 @@ const EditForm = ({
 
   return (
     <div>
-      <Tooltip title="Edit">
-        <IconButton aria-label="Edit" onClick={handleToggle}>
-          <CreateIcon />
-        </IconButton>
-      </Tooltip>
-      <Backdrop className={classes.backdrop} open={open}>
+      <Backdrop className={classes.backdrop} open={openEditor}>
         <div>
           <form className={classes.root} noValidate autoComplete="off">
             <div>
